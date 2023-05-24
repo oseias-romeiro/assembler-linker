@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
 
-#include <instructionTable.h>
+#include <instructionTable.hpp>
 
 using namespace std;
 
-
+// get source code
 vector<string> getSourceCode(string file_path){
-    // get source code
     ifstream sourceCodeFile(file_path + ".asm");
 
     if (!sourceCodeFile.is_open()) {
@@ -24,7 +23,8 @@ vector<string> getSourceCode(string file_path){
     return sourceCode;
 }
 
-vector<int> assemble(const vector<string>& codigoFonte) {}
+// assemble source code to object code
+vector<int> assemble(const vector<string>& sourceCode) {}
 
 void output(string file_path, vector<int> asmCode) {
     ofstream outFile(file_path);
