@@ -2,12 +2,15 @@
 #include <fstream>
 
 #include <instructionTable.hpp>
+#include <preProcessor.hpp>
 
 using namespace std;
 
+// TODO: como o método utilizado será passagem unica então tente juntar as funções de leitura e escrita com o assemble
+
 // get source code
-vector<string> getSourceCode(string file_path){
-    ifstream sourceCodeFile(file_path + ".asm");
+vector<string> getSourceCode(string pre_file){
+    ifstream sourceCodeFile(pre_file);
 
     if (!sourceCodeFile.is_open()) {
         throw "Não foi possível abrir o código fonte.";
@@ -23,11 +26,11 @@ vector<string> getSourceCode(string file_path){
     return sourceCode;
 }
 
-// assemble source code to object code
-vector<int> assemble(const vector<string>& sourceCode) {}
+// assemble source code to excutable code
+//vector<int> assemble(const vector<string>& sourceCode) {}
 
 void output(string file_path, vector<int> asmCode) {
-    ofstream outFile(file_path);
+    ofstream outFile(file_path + ".exc");
 
     if (!outFile.is_open()) {
         throw "Não foi possível criar o código objeto.";
@@ -43,17 +46,23 @@ void output(string file_path, vector<int> asmCode) {
 int main(int argc, char* argv[]){
     vector<string> sourceCode;
     vector<int> asmCode;
+    string pre_file;
+    string file_source = (string) argv[1];
+
+    // pre-processor
+    pre_file = preProcessor(file_source);
 
     // get source code
-    try { sourceCode = getSourceCode((string) argv[1]); }
-    catch(char const* e){ cerr << e << endl; return 1;}
+    sourceCode = getSourceCode(pre_file);
     
+    /*
     // assemble
     asmCode = assemble(sourceCode);
 
     // output file
-    try { output((string) argv[1], asmCode); }
-    catch(char const* e){ cerr << e << endl; return 1;}
+    output(file_source, asmCode);
+
+    */
 
     return 0;
 }

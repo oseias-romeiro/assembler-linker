@@ -12,7 +12,7 @@ Execute os comandos na pasta raiz do projeto
 ## Montador
 
 ```sh
-    g++ -I ./includes -Wall -o montador ./src/montador.cpp
+    g++ -I ./includes -Wall -o montador ./src/montador.cpp ./src/preProcessor.cpp
     ./montador {{ assembly_file_name }}
 ```
 
@@ -21,5 +21,5 @@ Execute os comandos na pasta raiz do projeto
 
 ## Ligador
 <!--
-    como executar o ligador e detalhes I/O
+    como executar o ligador e detalhes de I/O
 -->
