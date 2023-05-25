@@ -12,8 +12,8 @@ Execute os comandos na pasta raiz do projeto
 ## Montador
 
 ```sh
-    g++ -I ./includes -Wall -o montador ./src/montador.cpp ./src/preProcessor.cpp
-    ./montador {{ assembly_file_name }}
+g++ -I ./includes -Wall -o montador ./src/main.cpp ./src/preProcessor.cpp ./src/assembler.cpp
+./montador {{ assembly_file_name }}
 ```
 
 - `assembly_file_name`: nome do código fonte em assembly (sem extensão)

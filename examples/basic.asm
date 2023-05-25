@@ -1,0 +1,8 @@
+
+; comentario teste
+
+SECTION TEXT
+INPUT N
+
+SECTION DATA
+N: SPACE
