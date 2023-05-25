@@ -1,6 +1,14 @@
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
 
-void assembler(string pre_file);
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <sstream>
+#include <unordered_map>
+
+using namespace std;
+
+void assembler(const string pre_file);
 
 #endif

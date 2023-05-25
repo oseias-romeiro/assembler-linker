@@ -1,8 +1,11 @@
 
 ; comentario teste
 
+SECTION DATA
+DOIS: 2
+N: SPACE
+
 SECTION TEXT
 INPUT N
 
-SECTION DATA
-N: SPACE
+

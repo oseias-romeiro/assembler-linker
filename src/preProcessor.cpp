@@ -15,10 +15,9 @@
 
 using namespace std;
 
-string preProcessor(const string& inputFile) {
-    string out_file_name = inputFile + "_pre.asm";
+void preProcessor(const string inputFile) {
     ifstream inFile(inputFile + ".asm");
-    ofstream outFile(out_file_name);
+    ofstream outFile(inputFile + "_pre.asm");
 
     if (!inFile.is_open() || !outFile.is_open()) {
         throw "Erro ao abrir os arquivos.";
@@ -44,6 +43,4 @@ string preProcessor(const string& inputFile) {
     }
     inFile.close();
     outFile.close();
-
-    return out_file_name;
 }
