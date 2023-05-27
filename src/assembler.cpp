@@ -45,11 +45,12 @@ void assembler(const string file_source) {
         cout << "Não foi possível abrir o código pre-processado." << endl;
     }
 
-    string line;
-    vector<string> tokens;
+    string line, value;
+    vector<string> tokens, excString;
     Instruction inst;
     while (getline(sourceCodeFile, line)) {
         lineCount++;
+        tokens.clear();
 
         // line tokens
         tokens = getTokens(line);
@@ -79,11 +80,15 @@ void assembler(const string file_source) {
 
                     if (inst.opcodeSim != ""){
                         // write opcode
-                        excCodeFile << inst.opcodeNum << " ";
+                        excString.push_back(to_string(inst.opcodeNum));
 
                         // write operators
                         for (int i = 1; i < inst.wordSize; i++) {
-                            excCodeFile << symbolTable[tokens.at(i)] << " ";
+                            if (symbolTable.find(tokens.at(i)) != symbolTable.end()){
+                                excString.push_back(to_string(symbolTable[tokens.at(i)]));
+                            }else {
+                                excString.push_back("XX");
+                            }
                         }
                     }else {
                         cout << "(linha " << lineCount << ") instrução não encontrada" << endl;
@@ -92,9 +97,10 @@ void assembler(const string file_source) {
                 } else if (section_data){
                     if (tokens.at(0) == "CONST") {
                         // TODO: tratar constantes (converter para decimal)
-                        excCodeFile << tokens.at(1) << " ";
+                        excString.push_back(tokens.at(1));
                     } else if (tokens.at(0) == "SPACE") {
-                        excCodeFile << "00 ";
+                        // TODO: SPACE deve aceitar argumento
+                        excString.push_back("00");
                     } else {
                         cout << "(linha " << lineCount << ") erro na diretiva de dados" << endl;
                     }
@@ -102,8 +108,18 @@ void assembler(const string file_source) {
                 }
             }
         }
-        tokens.clear();
     }
+    
+    // forwarding problem
+    for (size_t i = 0; i < excString.size(); i++){
+        value = excString.at(i);
+        if (value == "XX") {
+            excCodeFile <<  symbolTable[value] << " ";
+        }else {
+            excCodeFile << value << " ";
+        }
+    }
+
     sourceCodeFile.close();
     excCodeFile.close();
 }
