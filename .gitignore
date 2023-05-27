@@ -37,4 +37,5 @@
 # special outputs
 montador
 linker
-**/*_pre*
+examples/*_pre.asm
+examples/*.exc

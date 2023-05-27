@@ -1,25 +1,21 @@
 # macro-montador
 Projeto de Software Basico que consiste em implementar um macro-montador em C/C++
 
-# Descrição
+## Descrição
 <!--
     descrever detalhes do projeto
 -->
 
-# Compilar/Executar
+## Compilar / Executar
 Execute os comandos na pasta raiz do projeto
 
-## Montador
+### Montador
 
 ```sh
-    g++ -I ./includes -Wall -o montador ./src/montador.cpp ./src/preProcessor.cpp
-    ./montador {{ assembly_file_name }}
+g++ -I ./includes -Wall -o montador ./src/main.cpp ./src/preProcessor.cpp ./src/assembler.cpp
 ```
 
-- `assembly_file_name`: nome do código fonte em assembly (sem extensão)
-- saída: é gerado o código executável (.exc), e se houver, erros são mostrados na tela
-
-## Ligador
+### Ligador
 <!--
     como executar o ligador e detalhes de I/O
 -->

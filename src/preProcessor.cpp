@@ -3,7 +3,7 @@
 - transforma tudo para maiusculo
 - retira espaços, tabulações ou enter desnecessários
 - qualquer rótulo (label + ':') seguido de enter deve ser colocado em uma linha só
-- retirar comentários (linha começa com ';')
+- retirar comentários (';' em qualquer parte do código)
 - converter valores depois de "CONST" para decimais
 
 */
@@ -15,10 +15,9 @@
 
 using namespace std;
 
-string preProcessor(const string& inputFile) {
-    string out_file_name = inputFile + "_pre.asm";
+void preProcessor(const string inputFile) {
     ifstream inFile(inputFile + ".asm");
-    ofstream outFile(out_file_name);
+    ofstream outFile(inputFile + "_pre.asm");
 
     if (!inFile.is_open() || !outFile.is_open()) {
         throw "Erro ao abrir os arquivos.";
@@ -27,8 +26,8 @@ string preProcessor(const string& inputFile) {
     string line;
     while (getline(inFile, line)) {
         
-        // ignora comentários (linhas começando com ';')
-        if (line.find(";")) {
+        // TODO: considere comentários não só no inicio da linha mas tbm no no final da instrução
+        if (line.find(";") && line != "\n" && line != "") {// ignora comentários e linhas vazias
 
             // Transforma tudo em maiúsculas
             transform(line.begin(), line.end(), line.begin(), ::toupper);
@@ -44,6 +43,4 @@ string preProcessor(const string& inputFile) {
     }
     inFile.close();
     outFile.close();
-
-    return out_file_name;
 }
