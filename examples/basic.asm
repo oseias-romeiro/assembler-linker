@@ -1,11 +1,9 @@
 
-; comentario teste
-
 SECTION DATA
-DOIS: 2
+DOIS: CONST 2
 N: SPACE
 
 SECTION TEXT
 INPUT N
-
-
+LOAD N
+ADD DOIS
