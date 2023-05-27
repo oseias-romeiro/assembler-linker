@@ -3,7 +3,7 @@
 - transforma tudo para maiusculo
 - retira espaços, tabulações ou enter desnecessários
 - qualquer rótulo (label + ':') seguido de enter deve ser colocado em uma linha só
-- retirar comentários (linha começa com ';')
+- retirar comentários (';' em qualquer parte do código)
 - converter valores depois de "CONST" para decimais
 
 */
@@ -26,8 +26,8 @@ void preProcessor(const string inputFile) {
     string line;
     while (getline(inFile, line)) {
         
-        // ignora comentários (linhas começando com ';')
-        if (line.find(";")) {
+        // TODO: considere comentários não só no inicio da linha mas tbm no no final da instrução
+        if (line.find(";") && line != "\n" && line != "") {// ignora comentários e linhas vazias
 
             // Transforma tudo em maiúsculas
             transform(line.begin(), line.end(), line.begin(), ::toupper);
