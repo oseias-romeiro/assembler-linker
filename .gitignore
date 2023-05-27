@@ -35,7 +35,7 @@
 **/.vscode
 
 # special outputs
-montador
-linker
+**/montador
+**/linker
 examples/*_pre.asm
 examples/*.exc

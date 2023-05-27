@@ -12,8 +12,15 @@ Execute os comandos na pasta raiz do projeto
 ### Montador
 
 ```sh
-g++ -I ./includes -Wall -o montador ./src/main.cpp ./src/preProcessor.cpp ./src/assembler.cpp
+make clean
+./montador {file_name}
 ```
+
+- `file_name`: nome do arquivo de entrada (sem extensão)
+- saida: erros de compilação se ouver
+- arquivos gerados: 
+    - programa pre-processado `{file_name}_pre.asm`
+    - código maquina `{file_name}.exc`
 
 ### Ligador
 <!--
