@@ -37,6 +37,8 @@ vector<string> getTokens(const string line) {
     return tokens;
 }
 
+// TODO: lidar com módulos
+// TODO: geração de codigo objeto
 void assembler(const string file_source) {
     ifstream sourceCodeFile(file_source+"_pre.asm");
     ofstream excCodeFile(file_source+".exc");
@@ -110,6 +112,7 @@ void assembler(const string file_source) {
         }
     }
     
+    // TODO: fazer essa parte dentro do loop de leitura
     // forwarding problem
     for (size_t i = 0; i < excString.size(); i++){
         value = excString.at(i);
