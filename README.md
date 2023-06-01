@@ -12,7 +12,7 @@ Execute os comandos na pasta raiz do projeto
 ### Montador
 
 ```sh
-make clean
+make all clean
 ./montador {file_name}
 ```
 
