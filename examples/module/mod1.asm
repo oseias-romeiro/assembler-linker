@@ -1,10 +1,11 @@
 ; ler o valor 'a' e chama mod2
 mod1: BEGIN
-EXTERN: mod1
+EXTERN: mod2
 PUBLIC: a
 
 SECTION TEXT
 INPUT a
+LOAD a
 jmp mod2
 end
 
