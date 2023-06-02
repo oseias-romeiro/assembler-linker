@@ -8,8 +8,8 @@
 
 using namespace std;
 
-int addr = -1, lineCount = 0;
-bool section_data = false, section_text = true;
+int addr = 0, lineCount = 0;
+bool section_data = false, section_text = false;
 
 // Symbol Table (symbol, value, external)
 unordered_map<string, pair<int, bool>> symbolTable;
@@ -26,6 +26,7 @@ vector<string> getTokens(const string line) {
     string token;
     bool use=false, def=false;
     
+    // TODO: separar essa parte em outra função
     // get label in line
     if (line.find(':') != string::npos) {
         iss >> token;
@@ -41,31 +42,31 @@ vector<string> getTokens(const string line) {
         }else if (token == "EXTERN") {
             use = true;
             symbolTable[token] = make_pair(addr, true);
-        }else {
-            symbolTable[token] = make_pair(addr, false);
-        }
+        } else symbolTable[token] = make_pair(addr, false);
     }
 
     // get line tokens
     while (iss >> token) {
         if (use) useTable[token] = {};
         else if (def) defTable[token] = 00;
-        else {
-            if (token != ",") tokens.push_back(token); // comma ignore
-        }
+        else if (token != ",") tokens.push_back(token); // comma ignore
     }
     return tokens;
 }
 
 // TODO: lidar com módulos
-// TODO: geração de codigo objeto
-void assembler(const string file_source) {
+// TODO: geração de codigo objeto/maquina
+void assembler(const string file_source, bool gen_cod_objeto) {
     ifstream sourceCodeFile(file_source+"_pre.asm");
-    ofstream excCodeFile(file_source+".obj");
+    ofstream excCodeFile;
 
-    if (!sourceCodeFile.is_open()) {
-        cout << "Não foi possível abrir o código pre-processado." << endl;
-    }
+    // choose gen exc or obj code
+    if (gen_cod_objeto) excCodeFile = ofstream(file_source+".obj");
+    else excCodeFile = ofstream(file_source+".exc");
+
+    if (!sourceCodeFile.is_open() || !excCodeFile.is_open())
+        cout << "Não foi possível abrir o código pre-processado ou criar o arquivo de saida." << endl; // throw
+    else {
 
     string line, value;
     vector<string> tokens, excString;
@@ -92,7 +93,7 @@ void assembler(const string file_source) {
             // check section scope
             if (tokens.at(0) == "SECTION") {
                 if (tokens.at(1) == "DATA") { section_data=true; section_text=false; }
-                else if (tokens.at(1) == "TEXT") {section_data=false; section_text=true;}
+                else if (tokens.at(1) == "TEXT") { section_data=false; section_text=true;}
                 else cout << "section syntax erro, linha: " << lineCount << endl;
             }else {
                 if (section_text){
@@ -105,11 +106,12 @@ void assembler(const string file_source) {
 
                         // write operators
                         for (int i = 1; i < inst.wordSize; i++) {
-                            // public var declaration
-                            if (defTable.find(tokens.at(i)) != defTable.end()) defTable[tokens.at(i)] = addr;
-                            // extern var used
-                            if (useTable.find(tokens.at(i)) != useTable.end()) useTable[tokens.at(i)].push_back(addr);
-
+                            if (gen_cod_objeto){
+                                // public var declaration
+                                if (defTable.find(tokens.at(i)) != defTable.end()) defTable[tokens.at(i)] = addr;
+                                // extern var used
+                                if (useTable.find(tokens.at(i)) != useTable.end()) useTable[tokens.at(i)].push_back(addr);
+                            }
                             // use symbol
                             if (symbolTable.find(tokens.at(i)) != symbolTable.end())
                                 excString.push_back(to_string(symbolTable[tokens.at(i)].first));
@@ -133,28 +135,31 @@ void assembler(const string file_source) {
         }
     }
 
-    // USE
-    excCodeFile << "USO" << endl;
-    for (const auto& use : useTable)
-        for (size_t i = 0; i < use.second.size(); i++)
-            excCodeFile << use.first << " " << use.second.at(i) << endl;
-    
-    // DEF
-    excCodeFile << "DEF" << endl;
-    for (const auto& def : defTable)
-        excCodeFile << def.first << " " << def.second << endl;
+    if (gen_cod_objeto){
+        // USE
+        excCodeFile << "USO" << endl;
+        for (const auto& use : useTable)
+            for (size_t i = 0; i < use.second.size(); i++)
+                excCodeFile << use.first << " " << use.second.at(i) << endl;
+        
+        // DEF
+        excCodeFile << "DEF" << endl;
+        for (const auto& def : defTable)
+            excCodeFile << def.first << " " << def.second << endl;
 
-    // TODO: RELATIVOS
-    // REL
-    excCodeFile << "RELATIVOS" << endl;
+        // TODO: RELATIVOS
+        // REL
+        excCodeFile << "RELATIVOS" << endl;
 
-    // TODO: fazer essa parte dentro do loop de leitura
-    // forwarding problem
-    excCodeFile << "CODE" << endl;
+        // TODO: fazer essa parte dentro do loop de leitura
+        // forwarding problem
+        excCodeFile << "CODE" << endl;
+    }
     for (size_t i = 0; i < excString.size(); i++){
         value = excString.at(i);
         if (!isdigit(value[0])) excCodeFile <<  symbolTable[value].first << " ";
         else excCodeFile << value << " ";
+    }
     }
     sourceCodeFile.close();
     excCodeFile.close();

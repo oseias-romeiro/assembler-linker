@@ -9,6 +9,6 @@
 
 using namespace std;
 
-void assembler(const string pre_file);
+void assembler(const string pre_file, bool gen_cod_objeto);
 
 #endif

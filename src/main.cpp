@@ -9,21 +9,15 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-    vector<string> sourceCode;
-    vector<int> asmCode;
 
-    if (argc > 5) {
-        cout << "Quantidade de arquivos não suportado!" << endl;
-    }else {
+    if (argc > 5) cout << "Quantidade de arquivos não suportado!" << endl;
+    else 
         for (int i = 1; i < argc; i++) {
-            string file_source = (string) argv[i];
-
             // pre-processor
-            preProcessor(file_source);
+            preProcessor(string(argv[i]));
 
             //assembler
-            assembler(file_source);
+            assembler(string(argv[i]), !(argc==2));
         }
-    }
     return 0;
 }

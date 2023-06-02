@@ -16,11 +16,12 @@ make all clean
 ./montador {file_name}
 ```
 
-- `file_name`: nome do arquivo de entrada (sem extensão)
-- saida: erros de compilação se ouver
+- `file_name`: nome do arquivo de entrada (sem extensão), podendo ser passado até 4 programas (módulos)
+- saida: erros, se ouver
 - arquivos gerados: 
     - programa pre-processado `{file_name}_pre.asm`
-    - código maquina `{file_name}.exc`
+    - um programa: código maquina `{file_name}.exc`
+    - módulos: código objeto `{file_name}.obj`
 
 ### Ligador
 <!--
