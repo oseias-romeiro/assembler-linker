@@ -120,8 +120,11 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                     // operators
                     for (int i = 1/* ignore command */; i < inst.wordSize; i++) {
                         addr++;
+                        // relatives
+                        relVec.push_back(addr);
                         // extern var used (token_i in useTable)
-                        if (useTable.find(tokens.at(i)) != useTable.end()) useTable[tokens.at(i)].push_back(addr);
+                        if (useTable.find(tokens.at(i)) != useTable.end())
+                            useTable[tokens.at(i)].push_back(addr);
                         // check token
                         if (symbolTable.find(tokens.at(i)) != symbolTable.end()) {
                             if (symbolTable[tokens.at(i)].external)
@@ -173,6 +176,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                     // operators
                     for (int i = 2/* ignore command & label */; i < inst.wordSize; i++) {
                         addr++;
+                        // relatives
+                        relVec.push_back(addr);
                         // extern var used (token_i in useTable)
                         if (useTable.find(tokens.at(i)) != useTable.end()) useTable[tokens.at(i)].push_back(addr);
                         // check token
@@ -232,6 +237,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
         for (size_t i = 0; i < relVec.size(); i++) {
             excCodeFile << relVec.at(i) << " ";
         }
+        excCodeFile << endl;
 
         // TODO: fazer essa parte dentro do loop de leitura
         // forwarding problem
