@@ -7,7 +7,7 @@ SECTION TEXT
 INPUT a
 LOAD a
 jmp mod2
-end
+STOP
 
 SECTION DATA
 a: SPACE

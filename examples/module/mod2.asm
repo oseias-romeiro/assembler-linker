@@ -10,5 +10,5 @@ OUTPUT tmp
 jmp mod1
 
 SECTION DATA
-CONST dois 2
-SPACE tmp
+dois: CONST 2
+tmp: SPACE
