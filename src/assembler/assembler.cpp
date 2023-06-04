@@ -131,6 +131,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                                 textCode.push_back(EXTERNAL);// external is 0
                             else if (symbolTable[tokens.at(i)].value == -1)
                                 textCode.push_back(tokens.at(i));// PUBLIC declared but not know addres yet
+                            else
+                                textCode.push_back(tokens.at(i));// token not known
                         }
                         else textCode.push_back(tokens.at(i));// token not known
                     }
@@ -160,8 +162,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
 
                 // declared label
                 if (symbolTable.find(label) == symbolTable.end())
-                    symbolTable[label] = {addr, false, false};// new label
-                else symbolTable[label] = {addr, false, symbolTable[label].pub}; // update address
+                    symbolTable[label] = {addr+1, false, false};// new label
+                else symbolTable[label] = {addr+1, false, symbolTable[label].pub}; // update address
 
                 // Instruction
                 inst = instructionTable[tokens.at(1)];
@@ -174,7 +176,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                     textCode.push_back(to_string(inst.opcodeNum));
                     addr++;
                     // operators
-                    for (int i = 2/* ignore command & label */; i < inst.wordSize; i++) {
+                    for (int i = 2/* ignore command & label */; i < inst.wordSize+1; i++) {
                         addr++;
                         // relatives
                         relVec.push_back(addr);
@@ -186,6 +188,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                                 textCode.push_back(EXTERNAL);// external is 0
                             else if (symbolTable[tokens.at(i)].value == -1)
                                 textCode.push_back(tokens.at(i));// PUBLIC declared but not know addres yet
+                            else
+                                textCode.push_back(tokens.at(i));// token not known
                         }
                         else textCode.push_back(tokens.at(i));// token not known
                     }
@@ -214,9 +218,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 break;
             }
 
-        }
-        }
-        }
+        }}}
     }
 
     if (gen_cod_objeto){
@@ -238,14 +240,12 @@ void assembler(const string file_source, bool gen_cod_objeto) {
             excCodeFile << relVec.at(i) << " ";
         }
         excCodeFile << endl;
-
-        // TODO: fazer essa parte dentro do loop de leitura
-        // forwarding problem
         excCodeFile << "CODE" << endl;
     }
+    // TODO: fazer essa parte dentro do loop de leitura
+        // forwarding problem
     for (size_t i = 0; i < textCode.size(); i++){
         value = textCode.at(i);
-        //cout << value << ":" << symbolTable[value].value << endl;
         if (!isdigit(value[0])) excCodeFile <<  symbolTable[value].value << " ";
         else excCodeFile << value << " ";
     }

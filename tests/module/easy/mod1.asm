@@ -2,12 +2,12 @@
 mod1: BEGIN
 EXTERN: mod2
 PUBLIC: a
+PUBLIC: volta
 
 SECTION TEXT
 INPUT a
-LOAD a
 jmp mod2
-STOP
+volta: STOP
 
 SECTION DATA
 a: SPACE
