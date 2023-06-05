@@ -103,7 +103,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
             section_line = getSection(&tokens.at(0), &tokens.at(1));
         
         if (!section_line){
-        if (label == "") {
+        if (label == "") {// no label
             switch (section) {
             case SECTION_MOD:
                 if (tokens.at(0) == "PUBLIC") symbolTable[tokens.at(1)] = {-1, false, true};
@@ -112,13 +112,10 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 // Instruction
                 inst = instructionTable[tokens.at(0)];
 
-                // TODO: tratar operações com endereços
                 if (inst.opcodeNum) {
-                    if ((int) tokens.size() != inst.wordSize && tokens.at(2) != "+"){
-                        if (tokens.at(2) == "+")
-                            operAddr= true;
-                        else 
-                            raiseError("Erro de sintaxe: quantidade de operadores inesperado");
+                    if ((int) tokens.size() != inst.wordSize){
+                        if (tokens.size() == 4 && tokens.at(2) == "+") operAddr = true;
+                        else raiseError("Erro de sintaxe: quantidade de operadores inesperado");
                     }
 
                     // opcode
@@ -135,24 +132,31 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                         // check token
                         if (symbolTable.find(tokens.at(i)) != symbolTable.end()) {
                             if (symbolTable[tokens.at(i)].external)
-                                textCode.push_back(EXTERNAL);// external is 0
+                                if(operAddr) textCode.push_back(to_string(stoi(EXTERNAL)+stoi(tokens.at(i+2))));
+                                else textCode.push_back(EXTERNAL);// external is 0
                             else if (symbolTable[tokens.at(i)].value == -1)
-                                textCode.push_back(tokens.at(i));// PUBLIC declared but not know addres yet
-                            else
-                                textCode.push_back(tokens.at(i));// token not known
+                                if(operAddr) textCode.push_back("+ "+tokens.at(i)+" "+tokens.at(i+2));
+                                else textCode.push_back(tokens.at(i));// PUBLIC declared but not know addres yet
+                            else //known
+                                if(operAddr) {
+                                    try { textCode.push_back(to_string(symbolTable[tokens.at(i)].value + stoi(tokens.at(i+2)))); }
+                                    catch(const std::exception& e) { raiseError("Erro de syntaxe após o operador +"); }
+                                }
+                                else textCode.push_back(to_string(symbolTable[tokens.at(i)].value));
                         }
-                        else textCode.push_back(tokens.at(i));// token not known
+                        else // token not known
+                            if(operAddr) textCode.push_back("+ "+tokens.at(i)+" "+tokens.at(i+2));
+                            else textCode.push_back(tokens.at(i));
                     }
                 }
                 else raiseError("erro de sintaxe: instrução não encontrada");
                 break;
             case SECTION_DATA:
                 // section data should have label
-                raiseError("erro de sintaxe");
+                raiseError("nenhum rótulo encontrado na seção de dados");
                 break;
             default:
-                // section data should have label
-                cout << "erro no escopo da seção " << endl;
+                raiseError("escopo de sessão não encontrada");
                 break;
             }
         }else {// has label
@@ -175,10 +179,11 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 // Instruction
                 inst = instructionTable[tokens.at(1)];
 
-                // TODO: valid instruction
                 if (inst.opcodeNum) {
-                    if ((int) tokens.size()-1 != inst.wordSize)
-                        raiseError("Erro de sintaxe: quantidade de operadores inesperado");
+                    if ((int) tokens.size()-1 != inst.wordSize && tokens.at(3) != "+"){
+                        if (tokens.at(3) == "+") operAddr= true;
+                        else raiseError("Erro de sintaxe: quantidade de operadores inesperado");
+                    }
                     // opcode
                     textCode.push_back(to_string(inst.opcodeNum));
                     addr++;
@@ -214,8 +219,12 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                     // TODO: tratar constantes (converter para decimal)
                     dataCode.push_back(tokens.at(2));
                 } else if (tokens.at(1) == "SPACE") {
-                    // TODO: SPACE deve aceitar argumento
-                    dataCode.push_back(SPACE);
+                    // check spaces
+                    if(tokens.size() == 3)
+                        for (int i = 0; i < stoi(tokens.at(2)); i++)
+                            dataCode.push_back(SPACE);
+                    else
+                        dataCode.push_back(SPACE);
                 } else raiseError("erro de sintaxe: declarativa não reconhecida");
                 
                 break;
@@ -237,10 +246,10 @@ void assembler(const string file_source, bool gen_cod_objeto) {
         
         // DEF
         excCodeFile << "DEF" << endl;
-        for (const auto& sym : symbolTable)
-            if (sym.second.pub) excCodeFile << sym.first << " " << sym.second.value << endl;
-
-        // TODO: RELATIVOS
+        for (const auto& sym : symbolTable){
+            if (sym.second.value == -1) excCodeFile << sym.first << " " << 0 << endl;
+            else if (sym.second.pub) excCodeFile << sym.first << " " << sym.second.value << endl;
+        }
         // REL
         excCodeFile << "RELATIVOS" << endl;
         for (size_t i = 0; i < relVec.size(); i++) {
@@ -249,16 +258,24 @@ void assembler(const string file_source, bool gen_cod_objeto) {
         excCodeFile << endl;
         excCodeFile << "CODE" << endl;
     }
-    // TODO: fazer essa parte dentro do loop de leitura
-        // forwarding problem
+    // forwarding problem
     for (size_t i = 0; i < textCode.size(); i++){
         value = textCode.at(i);
-        if (!isdigit(value[0])) excCodeFile <<  symbolTable[value].value << " ";
+        if (!isdigit(value[0])){
+            if (value[0] == '+') {
+                vector<string> opers;
+                istringstream iss(value);
+                string plus, key, value;
+                while (iss >> plus >> key >> value) { excCodeFile << symbolTable[key].value + stoi(value) << " "; }
+            }
+            else excCodeFile << symbolTable[value].value << " ";
+        }
         else excCodeFile << value << " ";
     }
+    // data section at end
     for (size_t i = 0; i < dataCode.size(); i++){
         value = dataCode.at(i);
-        if (!isdigit(value[0])) excCodeFile <<  symbolTable[value].value << " ";
+        if (!isdigit(value[0])) excCodeFile << symbolTable[value].value << " ";
         else excCodeFile << value << " ";
     }
     }
