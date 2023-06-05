@@ -58,25 +58,19 @@ void correction(){
 	bool corrected;
 	for (size_t i = 0; i < code.size(); i++){
 		corrected = false;
-		for (auto &&u : uso){
+		for (auto &&u : uso)
 			// need correction
-			if (u.second == (int) i){
+			if (u.second == (int) i)
 				// search in def table
 				if (def.find(u.first) != def.end()){
-					cout << "uso: " << code[i] << "->" << def[u.first] << endl;
 					code[i] = def[u.first];
 					corrected = true;
 				}
-			}
-		}
 		if (!corrected)
-			for (size_t j = 0; j < relatives.size(); j++){
+			for (size_t j = 0; j < relatives.size(); j++)
 				// need correction
-				if (relatives[j].first+relatives[j].second == (int) i) {
-					cout << "rel: " << code[i] << "->" << code[i]+relatives[j].second << endl;
+				if (relatives[j].first+relatives[j].second == (int) i)
 					code[i] = code[i]+relatives[j].second;
-				}
-			}
 	}
 }
 
