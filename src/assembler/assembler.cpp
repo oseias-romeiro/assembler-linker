@@ -91,10 +91,11 @@ void assembler(const string file_source, bool gen_cod_objeto) {
     while (getline(sourceCodeFile, line)) {
         lineCount++;
         tokens.clear();
+        bool operAddr = false; // adress operations (ex.: label+2)
 
         // line tokens
         tokens = getTokens(&line);
-        if (tokens.size() > 0) {
+        if (tokens.size() > 0 && tokens.at(0) != "END") {
         // return label or ""
         label = getLabel(tokens.at(0));
         // set section scope
@@ -111,10 +112,15 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 // Instruction
                 inst = instructionTable[tokens.at(0)];
 
-                // TODO: valid instruction
+                // TODO: tratar operações com endereços
                 if (inst.opcodeNum) {
-                    if ((int) tokens.size() != inst.wordSize)
-                        raiseError("Erro de sintaxe: quantidade de operadores inesperado");
+                    if ((int) tokens.size() != inst.wordSize && tokens.at(2) != "+"){
+                        if (tokens.at(2) == "+")
+                            operAddr= true;
+                        else 
+                            raiseError("Erro de sintaxe: quantidade de operadores inesperado");
+                    }
+
                     // opcode
                     textCode.push_back(to_string(inst.opcodeNum));
                     addr++;
