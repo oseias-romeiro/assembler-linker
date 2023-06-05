@@ -74,7 +74,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
 
     // init global variables
     addr = -1;
-    section = 0;// 0: module; 1: text; 2: data
+    section = SECTION_MOD;// 0: module; 1: text; 2: data
     lineCount = 0;
     filename = file_source+"_pre.asm";
     symbolTable = {}, useTable = {};
@@ -105,7 +105,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
         if (label == "") {
             switch (section) {
             case SECTION_MOD:
-                raiseError("erro de sintaxe: rotulo esperado");
+                if (tokens.at(0) == "PUBLIC") symbolTable[tokens.at(1)] = {-1, false, true};
+                break;
             case SECTION_TEXT:
                 // Instruction
                 inst = instructionTable[tokens.at(0)];
@@ -136,7 +137,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                         }
                         else textCode.push_back(tokens.at(i));// token not known
                     }
-                }else raiseError("erro de sintaxe: instrução não encontrada");
+                }
+                else raiseError("erro de sintaxe: instrução não encontrada");
                 break;
             case SECTION_DATA:
                 // section data should have label
@@ -151,11 +153,10 @@ void assembler(const string file_source, bool gen_cod_objeto) {
 
             switch (section) {
             case SECTION_MOD:
-                if (label == "EXTERN") {
-                    symbolTable[tokens.at(1)] = {0, true, false};
-                    useTable[tokens.at(1)] = {};
+                if (tokens.at(1) == "EXTERN") {
+                    symbolTable[label] = {0, true, false};
+                    useTable[label] = {};
                 }
-                else if (label == "PUBLIC") symbolTable[tokens.at(1)] = {-1, false, true};
                 else if (tokens.at(1) == "BEGIN") symbolTable[label] = {0, false, true};
                 break;
             case SECTION_TEXT:

@@ -1,8 +1,8 @@
 ; ler o valor 'a' e chama mod2
 mod1: BEGIN
-EXTERN: mod2
-PUBLIC: a
-PUBLIC: volta
+mod2: EXTERN
+PUBLIC a
+PUBLIC volta
 
 SECTION TEXT
 INPUT a

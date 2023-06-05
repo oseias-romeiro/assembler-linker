@@ -1,7 +1,7 @@
 ; adiciona 2 na variavel externa 'a', salva o resultado em tmp, mostra na tela e retorna para mod1
 mod2: BEGIN
-EXTERN: a
-EXTERN: volta
+a: EXTERN
+volta: EXTERN
 
 SECTION TEXT
 LOAD a
