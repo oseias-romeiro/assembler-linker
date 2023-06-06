@@ -15,7 +15,8 @@ using namespace std;
 // global tables
 vector<int> code;
 vector<pair<int, int>> relatives;
-unordered_map<string, int> uso, def;
+vector<pair<string, int>> uso;
+unordered_map<string, int> def;
 // global variables
 vector<int> correctionFactor;
 int fileId = 0;
@@ -29,7 +30,7 @@ void joinGlobalTables(const string* line){
 	// fill tables
 	if (section == USO)
 		while (iss >> key >> value){
-			uso[key] = stoi(value) + correctionFactor.at(fileId);
+			uso.push_back(pair(key, stoi(value) + correctionFactor.at(fileId)));
 		}
 	else if (section == DEF)
 		while (iss >> key >> value){
@@ -56,21 +57,26 @@ void joinGlobalTables(const string* line){
 }
 void correction(){
 	bool corrected;
- 
- for (auto &&r : relatives){
-   corrected = false;
-   // global correction
-   for (auto &&u : uso)
-     if (u.second == r.first){
-       // get in def
-       code[r.first] = def[u.first];
-       corrected = true;
-     }
-   // local correction
-   if (!corrected)
-     code[r.first] += r.second;
- }
- /*
+	int addr_c;
+
+	for (auto &&r : relatives){
+		corrected = false;
+		addr_c = r.first+r.second;
+		// global correction
+		for (auto &&u : uso)
+			if (u.second == addr_c){
+				// get in def
+				cout << "USO: " << code[addr_c] << "->" << def[u.first] << endl;
+				code[addr_c] = def[u.first];
+				corrected = true; //mark as corrected
+			}
+		// local correction
+		if (!corrected){
+			cout << "rel: " << code[addr_c] << "->" << code[addr_c]+r.second << endl;
+			code[addr_c] += r.second;
+		}
+	}
+ 	/*
 	for (size_t i = 0; i < code.size(); i++){
 		corrected = false;
 		for (auto &&u : uso)
@@ -127,6 +133,9 @@ int main(int argc, char* argv[]){
 		section = -1;
 		readFile(argv[i]);
 	}
+	cout << "USO:" << endl;
+	for(auto &&u : uso)
+		cout << u.first << ":"<<u.second << endl;
 	// correcion adresses
 	correction();
 
