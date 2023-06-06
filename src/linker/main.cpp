@@ -56,6 +56,21 @@ void joinGlobalTables(const string* line){
 }
 void correction(){
 	bool corrected;
+ 
+ for (auto &&r : relatives){
+   corrected = false;
+   // global correction
+   for (auto &&u : uso)
+     if (u.second == r.first){
+       // get in def
+       code[r.first] = def[u.first];
+       corrected = true;
+     }
+   // local correction
+   if (!corrected)
+     code[r.first] += r.second;
+ }
+ /*
 	for (size_t i = 0; i < code.size(); i++){
 		corrected = false;
 		for (auto &&u : uso)
@@ -71,7 +86,7 @@ void correction(){
 				// need correction
 				if (relatives[j].first+relatives[j].second == (int) i)
 					code[i] = code[i]+relatives[j].second;
-	}
+	}*/
 }
 
 void readFile(const string filename){
