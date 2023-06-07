@@ -66,8 +66,8 @@ void correction(){
 		for (auto &&u : uso)
 			if (u.second == addr_c){
 				// get in def
-				cout << "USO: " << code[addr_c] << "->" << def[u.first] << endl;
-				code[addr_c] = def[u.first];
+				cout << "USO: " << code[addr_c] << "->" << code[addr_c]+def[u.first] << endl;
+				code[addr_c] += def[u.first];// if not 0 so has address opdration
 				corrected = true; //mark as corrected
 			}
 		// local correction
