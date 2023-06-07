@@ -66,33 +66,12 @@ void correction(){
 		for (auto &&u : uso)
 			if (u.second == addr_c){
 				// get in def
-				cout << "USO: " << code[addr_c] << "->" << code[addr_c]+def[u.first] << endl;
 				code[addr_c] += def[u.first];// if not 0 so has address opdration
 				corrected = true; //mark as corrected
 			}
 		// local correction
-		if (!corrected){
-			cout << "rel: " << code[addr_c] << "->" << code[addr_c]+r.second << endl;
-			code[addr_c] += r.second;
-		}
+		if (!corrected) code[addr_c] += r.second;
 	}
- 	/*
-	for (size_t i = 0; i < code.size(); i++){
-		corrected = false;
-		for (auto &&u : uso)
-			// need correction
-			if (u.second == (int) i)
-				// search in def table
-				if (def.find(u.first) != def.end()){
-					code[i] = def[u.first];
-					corrected = true;
-				}
-		if (!corrected)
-			for (size_t j = 0; j < relatives.size(); j++)
-				// need correction
-				if (relatives[j].first+relatives[j].second == (int) i)
-					code[i] = code[i]+relatives[j].second;
-	}*/
 }
 
 void readFile(const string filename){
@@ -133,9 +112,6 @@ int main(int argc, char* argv[]){
 		section = -1;
 		readFile(argv[i]);
 	}
-	cout << "USO:" << endl;
-	for(auto &&u : uso)
-		cout << u.first << ":"<<u.second << endl;
 	// correcion adresses
 	correction();
 
