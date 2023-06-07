@@ -104,7 +104,7 @@ int main(int argc, char* argv[]){
 	string filename = argv[1];
 	ofstream output(filename + ".exc");
 
-	if (!output.is_open()) throw runtime_error("Não foi possível criar o arquivo de saida");
+	if (!output.is_open()) throw ifstream::failure("Não foi possível criar o arquivo de saida");
 
 	// read file and resolve global tables
 	for (int i = 1; i < argc; i++) {
