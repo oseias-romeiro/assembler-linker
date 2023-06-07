@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <unordered_map>
+#include <stdexcept>
 
 using namespace std;
 
@@ -98,13 +99,12 @@ void readFile(const string filename){
 
 int main(int argc, char* argv[]){
 
-    if (argc > 5) cout << "Quantidade de arquivos não suportado!" << endl;
+    if (argc > 5) throw runtime_error("Quantidade de arquivos não suportado!");
 
 	string filename = argv[1];
 	ofstream output(filename + ".exc");
 
-	if (!output.is_open())
-        cout << "Não foi possível criar o arquivo de saida" << endl;
+	if (!output.is_open()) throw runtime_error("Não foi possível criar o arquivo de saida");
 
 	// read file and resolve global tables
 	for (int i = 1; i < argc; i++) {

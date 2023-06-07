@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include <preProcessor.hpp>
 #include <assembler.hpp>
@@ -10,7 +11,7 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
-    if (argc > 5) cout << "Quantidade de arquivos não suportado!" << endl;
+    if (argc > 5) throw runtime_error("Quantidade de arquivos não suportado!");
     else 
         for (int i = 1; i < argc; i++) {
             // pre-processor
