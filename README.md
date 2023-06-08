@@ -2,10 +2,23 @@
 Projeto de Software Basico que consiste em implementar um macro-montador em C/C++
 
 ## Descrição
-Implementação de um montador e ligador implementado em C/C++ e compilado em GCC. Desenvolvido com alvo em uma máquina hipotética e um assembly inventado, utilizado durante a disciplina.
+Implementação de um montador e ligador implementado em C/C++, compilado em GCC e utilizando ambiente Linux. Desenvolvido com alvo em uma máquina hipotética e um assembly inventado para fins educativos utilizado durante a disciplina.
+
+No projeto, foi preferível criar um arquivo pre-processado para cada programa e utilizar o algoritmo de passagem única no processo de montagem. Sendo o montador também responsável por apontar os erros encontrados e indicar o tipo de erro (léxico, sintático ou semântico). O ligador, recebe os arquivos objetos gerado pelo montador e gera o executável (caso não esteja usando módulos, o montador gera o executável diretamente).
 
 ## Testes
-Testes foram desenvolvidos para verificar o funcionado do montador e do ligador, disponibilizados na pasta `tests`
+Na pasta `tests` contem códigos assembly com o intuito de testar o funcionamento do montador e do ligador e verificar se condiz com os requisistos do projeto.
+
+- Estrutura de pastas de testes
+```
+├── addressing
+├── errors
+├── forwarding
+├── loops
+├── module
+└── pre_processor
+```
+
 
 ## Compilar / Execução
 Execute os comandos na pasta raiz do projeto
@@ -23,11 +36,11 @@ make all clean
 ```
 
 - `file_name`: nome do arquivo assembly (sem extensão), podendo ser passado até 4 programas (módulos)
-- saida: erros, se ouver
+- saída: se houver, printa erros no formato: `<filename> - <numero_linha>: <menssagem_erro>`
 - arquivos gerados: 
     - programa pre-processado `{file_name}_pre.asm`
     - Código:
-        - caso seja passado apenas um programa, é gerado código máquina `{file_name}.exc`
+        - Caso seja passado apenas um programa, é gerado código máquina `{file_name}.exc`
         - Caso use módulos, é gerado código objeto `{file_name}.obj`
 
 ### Ligador
@@ -36,6 +49,10 @@ make all clean
 ./linker {file_name1} {file_name2}
 ```
 
-- `file_namei`: nome do arquivo objeto (sem extensão), podendo ser passado até 4 módulos
+- `file_name{i}`: nome do arquivo objeto (sem extensão), podendo ser passado até 4 módulos
 - Gera o código máquina `{file_name1}.exc`
+
+
+## Conclusão
+Assim, foi implementado o montador/ligador satisfazendo os requisitos do projeto, sendo testado e verificado. Quero, além disso, relatar as dificulades na implementação, como lidar com forwarding-problem, endereçamento e deslocamento de endereços. Gerando uma dificuldade, maior que eu esperava, para conseguir resolve-los. Além do material de exemplo do projeto que não ajudou muito, pois não seguia a mesma sintáxe usada em sala de aula e os arquivos não se relacionavam, como o arquivo-objeto que não foi gerado do código assembly mostrado.
 
