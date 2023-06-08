@@ -85,7 +85,8 @@ void assembler(const string file_source, bool gen_cod_objeto) {
     else excCodeFile = ofstream(file_source+".exc");
 
     if (!sourceCodeFile.is_open() || !excCodeFile.is_open())
-        throw ifstream::failure("Não foi possível abrir o código pre-processado ou criar o arquivo de saida.");
+        cout << "Não foi possível abrir o código pre-processado ou criar o arquivo de saida." << endl; // throw
+    else {
 
     while (getline(sourceCodeFile, line)) {
         lineCount++;
@@ -233,7 +234,7 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 break;
             }
 
-        }}
+        }}}
     }
 
     if (gen_cod_objeto){
