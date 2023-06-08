@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <unordered_map>
+#include <regex>
 
 #include <instructionTable.hpp>
 
@@ -30,6 +31,7 @@ vector<int> relVec;
 // global variables
 int section, lineCount ,addr;
 string filename;
+regex varRegex("[^a-zA-Z0-9_]");
 
 // get line tokens
 vector<string> getTokens(const string* line) {
@@ -43,7 +45,7 @@ vector<string> getTokens(const string* line) {
     return tokens;
 }
 
-string getLabel(string tokens0) {
+string getLabel(string& tokens0) {
     if (tokens0.find(':') != string::npos) return tokens0.substr(0, tokens0.length() - 1);
     else return "";
 }
@@ -56,19 +58,34 @@ bool getSection(const string* token0, const string* token1){
     if (*token0 == "SECTION") {
         if (*token1 == "TEXT") section = SECTION_TEXT;
         else if (*token1 == "DATA") section = SECTION_DATA;
-        else raiseError("erro de sintaxe: construção invalida de seção na linha");
+        else raiseError("Erro de sintaxe: construção inválida de seção");
         return true;// ignore line
     }
     return false;
 }
 
-// TODO: lidar com módulos
-// TODO: geração de codigo objeto/maquina
+void validLabel(string& variable){
+    if (isdigit(variable[0]) || regex_search(variable, varRegex))
+        raiseError("Erro léxico: declaração inválida");
+}
+
+int string2int(string value){
+    int res=0;
+    try {
+        res = stoi(value);
+    }
+    catch(const std::exception& e) {
+        raiseError("Erro de semântica: não foi possivel tratar o valor");
+    }
+    return res;
+}
+
 void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string* pre_filename) {
     string line, value, label;
     vector<string> tokens, textCode, dataCode;
     Instruction inst;
-    bool section_line = false;
+    bool section_line=false, section_text_found=false, begin=false;
+    regex twoLabels(":.*:");
 
     // init global variables
     addr = -1;
@@ -82,6 +99,9 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
         lineCount++;
         tokens.clear();
         bool operAddr = false; // adress operations (ex.: label+2)
+        
+        // check uniqueless label
+        if (regex_search(line, twoLabels)) raiseError("Erro de sintaxe: mais de uma label declarado na mesma linha");
 
         // line tokens
         tokens = getTokens(&line);
@@ -96,9 +116,13 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
         if (label == "") {// no label
             switch (section) {
             case SECTION_MOD:
-                if (tokens.at(0) == "PUBLIC") symbolTable[tokens.at(1)] = {-1, false, true};
+                if (tokens.at(0) == "PUBLIC"){
+                    if(!begin) raiseError("Erro de semântica: esperado declaração de BEGIN");
+                    symbolTable[tokens.at(1)] = {-1, false, true};
+                }
                 break;
             case SECTION_TEXT:
+                section_text_found = true;
                 // Instruction
                 inst = instructionTable[tokens.at(0)];
 
@@ -122,15 +146,15 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
                         // check token
                         if (symbolTable.find(tokens.at(i)) != symbolTable.end()) {
                             if (symbolTable[tokens.at(i)].external)
-                                if(operAddr) textCode.push_back(to_string(stoi(EXTERNAL)+stoi(tokens.at(i+2))));
+                                if(operAddr) textCode.push_back(to_string(string2int(EXTERNAL)+string2int(tokens.at(i+2))));
                                 else textCode.push_back(EXTERNAL);// external is 0
                             else if (symbolTable[tokens.at(i)].value == -1)
                                 if(operAddr) textCode.push_back("+ "+tokens.at(i)+" "+tokens.at(i+2));
                                 else textCode.push_back(tokens.at(i));// PUBLIC declared but not know addres yet
                             else //known
                                 if(operAddr) {
-                                    try { textCode.push_back(to_string(symbolTable[tokens.at(i)].value + stoi(tokens.at(i+2)))); }
-                                    catch(const std::exception& e) { raiseError("Erro de syntaxe após o operador +"); }
+                                    try { textCode.push_back(to_string(symbolTable[tokens.at(i)].value + string2int(tokens.at(i+2)))); }
+                                    catch(const std::exception& e) { raiseError("Erro de sintaxe após o operador '+'"); }
                                 }
                                 else textCode.push_back(to_string(symbolTable[tokens.at(i)].value));
                         }
@@ -139,14 +163,14 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
                             else textCode.push_back(tokens.at(i));
                     }
                 }
-                else raiseError("erro de sintaxe: instrução não encontrada");
+                else raiseError("Erro de semântica: instrução não encontrada");
                 break;
             case SECTION_DATA:
                 // section data should have label
-                raiseError("nenhum rótulo encontrado na seção de dados");
+                raiseError("Erro de semântica: nenhum rótulo encontrado na seção de dados");
                 break;
             default:
-                raiseError("escopo de sessão não encontrada");
+                raiseError("Erro de semântica: tipo de sessão não reconhecida");
                 break;
             }
         }else {// has label
@@ -154,12 +178,20 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
             switch (section) {
             case SECTION_MOD:
                 if (tokens.at(1) == "EXTERN") {
+                    if(!begin) raiseError("Erro de semântica: esperado declaração de BEGIN");
                     symbolTable[label] = {0, true, false};
                     useTable[label] = {};
                 }
-                else if (tokens.at(1) == "BEGIN") symbolTable[label] = {0, false, true};
+                else if (tokens.at(1) == "BEGIN") {
+                    begin=true;
+                    symbolTable[label] = {0, false, true};
+                }
                 break;
             case SECTION_TEXT:
+                section_text_found = true;
+
+                // valid label
+                validLabel(label);
 
                 // declared label
                 if (symbolTable.find(label) == symbolTable.end())
@@ -195,37 +227,38 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
                         }
                         else textCode.push_back(tokens.at(i));// token not known
                     }
-                }else raiseError("erro de sintaxe");
+                }else raiseError("Erro de semântica: instrução não encontrada");
                 break;
             case SECTION_DATA:
                 addr++;
-
+                // valid label
+                validLabel(label);
                 // declared label
                 if (symbolTable.find(label) == symbolTable.end())
                     symbolTable[label] = {addr, false, false};// new label
                 else symbolTable[label] = {addr, false, symbolTable[label].pub}; // update address
                 
                 if (tokens.at(1) == "CONST") {
-                    // TODO: tratar constantes (converter para decimal)
                     dataCode.push_back(tokens.at(2));
                 } else if (tokens.at(1) == "SPACE") {
                     // check spaces
                     if(tokens.size() == 3)
-                        for (int i = 0; i < stoi(tokens.at(2)); i++)
+                        for (int i = 0; i < string2int(tokens.at(2)); i++)
                             dataCode.push_back(SPACE);
                     else
                         dataCode.push_back(SPACE);
-                } else raiseError("erro de sintaxe: declarativa não reconhecida");
+                } else raiseError("Erro de semântica: declarativa não reconhecida");
                 
                 break;
             default:
                 // section data should have label
-                raiseError("erro no escopo da seção");
+                raiseError("Erro de semântica: tipo de sessão não reconhecida");
                 break;
             }
 
         }}}
     }
+    if (!section_text_found) raiseError("Erro de semântica: Seção TEXT não encontrada");
 
     if (gen_cod_objeto){
         // USE
@@ -256,16 +289,31 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
                 vector<string> opers;
                 istringstream iss(value);
                 string plus, key, value;
-                while (iss >> plus >> key >> value) { outFile << symbolTable[key].value + stoi(value) << " "; }
+                while (iss >> plus >> key >> value) {
+                    if(symbolTable.find(key) != symbolTable.end())
+                        outFile << symbolTable[key].value + string2int(value) << " ";
+                    else
+                        raiseError("Erro de semântica: símbolo não definidio");
+                }
             }
-            else outFile << symbolTable[value].value << " ";
+            else{
+                if(symbolTable.find(value) != symbolTable.end())
+                    outFile << symbolTable[value].value << " ";
+                else
+                    raiseError("Erro de semântica: símbolo não definidio");
+            }
         }
         else outFile << value << " ";
     }
     // data section at end
     for (size_t i = 0; i < dataCode.size(); i++){
         value = dataCode.at(i);
-        if (!isdigit(value[0])) outFile << symbolTable[value].value << " ";
+        if (!isdigit(value[0])) {
+            if(symbolTable.find(value) != symbolTable.end())
+                outFile << symbolTable[value].value << " ";
+            else
+                raiseError("Erro de semântica: símbolo não definidio");
+        }
         else outFile << value << " ";
     }
 }
