@@ -6,6 +6,7 @@ LOAD in
 ADD dois
 STORE res
 OUTPUT res
+STOP
 
 SECTION DATA
 dois: CONST 2

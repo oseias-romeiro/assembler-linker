@@ -1,4 +1,4 @@
-; baseado no tests/arithmetic/add2.asm, poremn abusando das propriedades do pre-processador
+; abusando das propriedades do pre-processador
 
 
 SECTION TEXT
@@ -7,6 +7,7 @@ SECTION TEXT
 	ADD dois
 	STORE res
 	OUTPUT res
+	STOP
 
 
 
