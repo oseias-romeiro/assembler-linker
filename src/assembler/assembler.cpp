@@ -64,9 +64,7 @@ bool getSection(const string* token0, const string* token1){
 
 // TODO: lidar com módulos
 // TODO: geração de codigo objeto/maquina
-void assembler(const string file_source, bool gen_cod_objeto) {
-    ifstream sourceCodeFile(file_source+"_pre.asm");
-    ofstream excCodeFile;
+void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string* pre_filename) {
     string line, value, label;
     vector<string> tokens, textCode, dataCode;
     Instruction inst;
@@ -76,19 +74,11 @@ void assembler(const string file_source, bool gen_cod_objeto) {
     addr = -1;
     section = SECTION_MOD;// 0: module; 1: text; 2: data
     lineCount = 0;
-    filename = file_source+"_pre.asm";
+    filename = *pre_filename+"_pre.asm";
     symbolTable = {}, useTable = {};
     relVec = {};
 
-    // choose gen exc or obj code
-    if (gen_cod_objeto) excCodeFile = ofstream(file_source+".obj");
-    else excCodeFile = ofstream(file_source+".exc");
-
-    if (!sourceCodeFile.is_open() || !excCodeFile.is_open())
-        cout << "Não foi possível abrir o código pre-processado ou criar o arquivo de saida." << endl; // throw
-    else {
-
-    while (getline(sourceCodeFile, line)) {
+    while (getline(inFile, line)) {
         lineCount++;
         tokens.clear();
         bool operAddr = false; // adress operations (ex.: label+2)
@@ -239,24 +229,24 @@ void assembler(const string file_source, bool gen_cod_objeto) {
 
     if (gen_cod_objeto){
         // USE
-        excCodeFile << "USO" << endl;
+        outFile << "USO" << endl;
         for (const auto& use : useTable)
             for (size_t i = 0; i < use.second.size(); i++)
-                excCodeFile << use.first << " " << use.second.at(i) << endl;
+                outFile << use.first << " " << use.second.at(i) << endl;
         
         // DEF
-        excCodeFile << "DEF" << endl;
+        outFile << "DEF" << endl;
         for (const auto& sym : symbolTable){
-            if (sym.second.value == -1) excCodeFile << sym.first << " " << 0 << endl;
-            else if (sym.second.pub) excCodeFile << sym.first << " " << sym.second.value << endl;
+            if (sym.second.value == -1) outFile << sym.first << " " << 0 << endl;
+            else if (sym.second.pub) outFile << sym.first << " " << sym.second.value << endl;
         }
         // REL
-        excCodeFile << "RELATIVOS" << endl;
+        outFile << "RELATIVOS" << endl;
         for (size_t i = 0; i < relVec.size(); i++) {
-            excCodeFile << relVec.at(i) << " ";
+            outFile << relVec.at(i) << " ";
         }
-        excCodeFile << endl;
-        excCodeFile << "CODE" << endl;
+        outFile << endl;
+        outFile << "CODE" << endl;
     }
     // forwarding problem
     for (size_t i = 0; i < textCode.size(); i++){
@@ -266,20 +256,17 @@ void assembler(const string file_source, bool gen_cod_objeto) {
                 vector<string> opers;
                 istringstream iss(value);
                 string plus, key, value;
-                while (iss >> plus >> key >> value) { excCodeFile << symbolTable[key].value + stoi(value) << " "; }
+                while (iss >> plus >> key >> value) { outFile << symbolTable[key].value + stoi(value) << " "; }
             }
-            else excCodeFile << symbolTable[value].value << " ";
+            else outFile << symbolTable[value].value << " ";
         }
-        else excCodeFile << value << " ";
+        else outFile << value << " ";
     }
     // data section at end
     for (size_t i = 0; i < dataCode.size(); i++){
         value = dataCode.at(i);
-        if (!isdigit(value[0])) excCodeFile << symbolTable[value].value << " ";
-        else excCodeFile << value << " ";
+        if (!isdigit(value[0])) outFile << symbolTable[value].value << " ";
+        else outFile << value << " ";
     }
-    }
-    sourceCodeFile.close();
-    excCodeFile.close();
 }
 

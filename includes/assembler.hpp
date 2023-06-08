@@ -10,6 +10,6 @@
 
 using namespace std;
 
-void assembler(const string pre_file, bool gen_cod_objeto);
+void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string* pre_filename);
 
 #endif

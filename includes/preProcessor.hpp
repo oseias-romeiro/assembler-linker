@@ -8,6 +8,6 @@
 
 using namespace std;
 
-void preProcessor(const string inputFile);
+void preProcessor(ifstream& inFile, ofstream& outFile);
 
 #endif

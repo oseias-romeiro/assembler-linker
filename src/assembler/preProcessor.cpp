@@ -15,13 +15,7 @@
 
 using namespace std;
 
-void preProcessor(const string inputFile) {
-    ifstream inFile(inputFile + ".asm");
-    ofstream outFile(inputFile + "_pre.asm");
-
-    if (!inFile.is_open() || !outFile.is_open())
-        cout << "Erro ao abrir os arquivos.";// throw
-    else {
+void preProcessor(ifstream& inFile, ofstream& outFile) {
 
     string line;
     while (getline(inFile, line)) {
@@ -41,7 +35,4 @@ void preProcessor(const string inputFile) {
             outFile << line << "\n";
         }
     }
-    }
-    inFile.close();
-    outFile.close();
 }

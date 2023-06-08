@@ -75,15 +75,11 @@ void correction(){
 	}
 }
 
-void readFile(const string filename){
-	ifstream objCode(filename+".obj");
+void readFile(ifstream& objCode){
 	string line;
 
 	// update correctionFactor
 	correctionFactor.push_back(addr+1);
-	
-	if (!objCode.is_open())
-        cout << "Não foi possível encontrar o arquivo" << filename << ".obj" << endl;
 
 	while (getline(objCode, line)) {
 		// join to global tables
@@ -94,23 +90,28 @@ void readFile(const string filename){
 		else if (line.find("RELATIVOS")  != string::npos) section = RELATIVOS;
 		else if (line.find("CODE") != string::npos) section = CODE;
 	}
-	objCode.close();
 }
 
 int main(int argc, char* argv[]){
-
-    if (argc > 5) throw runtime_error("Quantidade de arquivos não suportado!");
-
+	ifstream objCode;
 	string filename = argv[1];
+	string objFile;
 	ofstream output(filename + ".exc");
 
-	if (!output.is_open()) throw runtime_error("Não foi possível criar o arquivo de saida");
+    if (argc > 5) throw runtime_error("Quantidade de arquivos não suportado!");
+	if (!output.is_open()) throw fstream::failure("Não foi possível criar o arquivo de saida");
 
 	// read file and resolve global tables
 	for (int i = 1; i < argc; i++) {
 		fileId = i-1;
 		section = -1;
-		readFile(argv[i]);
+		objFile = argv[i];
+		objCode = ifstream(objFile+".obj");
+
+		if (!objCode.is_open()) throw fstream::failure("Não foi possível encontrar o arquivo "+objFile+".obj");
+		readFile(objCode);
+		
+		objCode.close();
 	}
 	// correcion adresses
 	correction();
