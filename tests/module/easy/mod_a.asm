@@ -1,12 +1,12 @@
-; ler o valor 'a' e chama mod2
-mod1: BEGIN
-mod2: EXTERN
+; ler o valor 'a' e chama mod_b
+mod_a: BEGIN
+mod_b: EXTERN
 PUBLIC a
 PUBLIC volta
 
 SECTION TEXT
 INPUT a
-jmp mod2
+jmp mod_b
 volta: STOP
 
 SECTION DATA

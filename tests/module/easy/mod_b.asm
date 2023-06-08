@@ -1,5 +1,5 @@
-; adiciona 2 na variavel externa 'a', salva o resultado em tmp, mostra na tela e retorna para mod1
-mod2: BEGIN
+; adiciona 2 na variavel externa 'a', salva o resultado em tmp, mostra na tela e retorna para mod_a
+mod_b: BEGIN
 a: EXTERN
 volta: EXTERN
 
