@@ -12,7 +12,6 @@ Na pasta `tests` contem códigos assembly com o intuito de testar o funcionament
 
 ```
 ├── addressing
-├── arithmetic
 ├── errors
 ├── forwarding
 ├── loops
