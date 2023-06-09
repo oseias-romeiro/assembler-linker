@@ -1,6 +1,6 @@
 ; ler o valor 'a' e chama mod_b
 mod_a: BEGIN
-mod_b: EXTERN
+EXTERN: mod_b
 PUBLIC a
 PUBLIC volta
 

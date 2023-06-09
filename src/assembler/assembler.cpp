@@ -177,10 +177,10 @@ void assembler(ifstream& inFile, ofstream& outFile, bool gen_cod_objeto, string*
 
             switch (section) {
             case SECTION_MOD:
-                if (tokens.at(1) == "EXTERN") {
+                if (label == "EXTERN") {
                     if(!begin) raiseError("Erro de semântica: esperado declaração de BEGIN");
-                    symbolTable[label] = {0, true, false};
-                    useTable[label] = {};
+                    symbolTable[tokens.at(1)] = {0, true, false};
+                    useTable[tokens.at(1)] = {};
                 }
                 else if (tokens.at(1) == "BEGIN") {
                     begin=true;
