@@ -1,33 +1,32 @@
 # macro-montador
 Projeto de Software Basico que consiste em implementar um macro-montador em C/C++
 
-## Descrição
-Implementação de um montador e ligador implementado em C/C++, compilado em GCC e utilizando ambiente Linux. Desenvolvido com alvo em uma máquina hipotética e um assembly inventado para fins educativos utilizado durante a disciplina.
+## Ambiente
+Implementação de um montador e ligador implementado em C++, compilado em GCC e utilizando ambiente Linux (gcc 12.2.0-17ubuntu1). Desenvolvido com alvo em uma máquina hipotética e um assembly inventado para fins educativos utilizado durante a disciplina, e utilizando o `simulador` fornecido no trabalho para execução dos programas.
 
-No projeto, foi preferível criar um arquivo pre-processado para cada programa e utilizar o algoritmo de passagem única no processo de montagem. Sendo o montador também responsável por apontar os erros encontrados e indicar o tipo de erro (léxico, sintático ou semântico). O ligador, recebe os arquivos objetos gerado pelo montador e gera o executável (caso não esteja usando módulos, o montador gera o executável diretamente).
+## Descrição
+No projeto, foi preferível criar um arquivo pre-processado para cada programa e utilizar o algoritmo de passagem única no processo de montagem. Sendo o montador também responsável por apontar os erros encontrados e indicar o tipo de erro (léxico, sintático ou semântico) nos arquivos pre-processados. O ligador, recebe os arquivos objetos gerado pelo montador e gera o executável (caso não esteja usando módulos, o montador gera o executável diretamente).
 
 ## Testes
-Na pasta `tests` contem códigos assembly com o intuito de testar o funcionamento do montador e do ligador e verificar se condiz com os requisistos do projeto.
+Na pasta `tests` contem códigos assembly com o intuito de testar o funcionamento do montador e do ligador e verificar se condiz com os requisistos do projeto. Segue abaixo a estrutura de pastas de testes:
 
-- Estrutura de pastas de testes
 ```
 ├── addressing
+├── arithmetic
 ├── errors
 ├── forwarding
 ├── loops
-├── module
-└── pre_processor
 ```
 
 
 ## Compilar / Execução
 Execute os comandos na pasta raiz do projeto
 
+### Gera os executáveis `montador` e `linker`
+
 ```sh
 make all clean
 ```
-
-- Gera os executáveis `montador` e `linker`
 
 ### Montador
 
@@ -43,7 +42,7 @@ make all clean
         - Caso seja passado apenas um programa, é gerado código máquina `{file_name}.exc`
         - Caso use módulos, é gerado código objeto `{file_name}.obj`
 
-### Ligador
+### Ligador (linker)
 
 ```sh
 ./linker {file_name1} {file_name2}
@@ -54,5 +53,5 @@ make all clean
 
 
 ## Conclusão
-Assim, foi implementado o montador/ligador satisfazendo os requisitos do projeto, sendo testado e verificado. Quero, além disso, relatar as dificulades na implementação, como lidar com forwarding-problem, endereçamento e deslocamento de endereços. Gerando uma dificuldade, maior que eu esperava, para conseguir resolve-los. Além do material de exemplo do projeto que não ajudou muito, pois não seguia a mesma sintáxe usada em sala de aula e os arquivos não se relacionavam, como o arquivo-objeto que não foi gerado do código assembly mostrado.
+Assim, foi implementado o montador/ligador satisfazendo os requisitos do projeto, sendo testado e verificado. Quero, além disso, relatar as dificulades na implementação: como lidar com forwarding-problem, endereçamento e deslocamento de endereços. Gerando uma dificuldade, maior que eu esperava, para conseguir resolve-los. Além do material de exemplo do projeto que não ajudou muito, pois não seguia a mesma sintáxe usada em sala de aula e os arquivos não se relacionavam, como o arquivo-objeto que não foi gerado apartir do código assembly mostrado. Porém, apesar das dificuldades, o projeto foi concluido com êxito, colocando em prática o conteúdo ministrado.
 
