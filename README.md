@@ -1,5 +1,5 @@
-# macro-montador
-Projeto de Software Basico que consiste em implementar um macro-montador em C/C++
+# montador-ligador
+Projeto de Software Basico que consiste em implementar um montador-ligador em C/C++
 
 ## Ambiente
 Implementação de um montador e ligador implementado em C++, compilado em GCC e utilizando ambiente Linux (gcc 12.2.0-17ubuntu1). Desenvolvido com alvo em uma máquina hipotética e um assembly inventado para fins educativos utilizado durante a disciplina, e utilizando o `simulador` fornecido no trabalho para execução dos programas.
